@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  
+  body {
+    @apply bg-dark-900 text-gray-100;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply container mx-auto px-4;
+  }
+  
+  .btn {
+    @apply px-4 py-2 rounded-md transition-all duration-300 font-medium focus:outline-none;
+  }
+  
+  .btn-primary {
+    @apply bg-accent-primary text-white font-semibold py-2.5 px-5 rounded-md transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary:hover {
+    background-color: #E57D00;
+  }
+  
+  .btn-secondary {
+    @apply bg-dark-700 hover:bg-dark-600 text-gray-200 font-semibold py-2.5 px-5 rounded-md transition-colors duration-150 border border-dark-500 hover:border-dark-400 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+  
+  .card {
+    @apply bg-dark-800 rounded-lg p-6 shadow-md transition-all duration-300;
+  }
+  
+  .input-field {
+    @apply block w-full px-3 py-2 bg-dark-800 border border-dark-600 rounded-md text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-accent-primary focus:border-accent-primary sm:text-sm transition-colors duration-150;
+  }
+  
+  .input-field-display {
+    @apply block w-full px-3 py-2 bg-dark-800 border border-dark-600 rounded-md text-gray-300 sm:text-sm;
+  }
+  
+  .glass-panel {
+    @apply bg-dark-800/80 backdrop-blur-sm border border-dark-600/50 rounded-lg;
+  }
+}
+
+.debug-red {
+  border: 1px solid red;
+}
+
+.debug-green {
+  border: 1px solid green;
+}
+
+.debug-blue {
+  border: 1px solid blue;
+}
+
+.input-field:focus, .input-field-display:focus-within {
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #1a202c;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #4a5568;
+  border-radius: 10px;
+  border: 2px solid #1a202c;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #718096;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #4a5568 #1a202c;
+}
