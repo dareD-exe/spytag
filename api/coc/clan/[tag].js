@@ -1,24 +1,41 @@
+// Required for proxy support
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import fetch from 'node-fetch';
+
 export default async function handler(request, response) {
   const { tag } = request.query;
   const encodedTag = encodeURIComponent(tag);
   const cocApiToken = process.env.COC_API_KEY;
+  const fixieUrl = process.env.FIXIE_URL;
 
   if (!cocApiToken) {
     console.error("COC_API_KEY is not defined in serverless function.");
     return response.status(500).json({ error: 'COC API Key not configured on the server' });
   }
 
+  if (!fixieUrl) {
+    console.error("FIXIE_URL is not defined in serverless function.");
+    return response.status(500).json({ error: 'Proxy URL not configured on the server' });
+  }
+
   const targetUrl = `https://api.clashofclans.com/v1/clans/${encodedTag}`;
 
   try {
     console.log(`[Serverless] Attempting to fetch clan: ${targetUrl}`);
-    // Vercel should automatically use FIXIE_URL for fetch
+    console.log(`[Serverless] COC_API_KEY available: ${cocApiToken ? 'Yes' : 'No'}`);
+    console.log(`[Serverless] FIXIE_URL available: ${fixieUrl ? 'Yes' : 'No'}`);
+    
+    // Create proxy agent using Fixie URL
+    const proxyAgent = new HttpsProxyAgent(fixieUrl);
+    
     const cocResponse = await fetch(targetUrl, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${cocApiToken}`,
         'Accept': 'application/json',
       },
+      // Use the proxy agent for this request
+      agent: proxyAgent
     });
 
     const responseBodyText = await cocResponse.text();
