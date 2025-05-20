@@ -3,6 +3,8 @@
  * Documentation: https://developer.clashofclans.com/
  */
 
+// This file now calls our Vercel Serverless Functions, which then call the CoC API via Fixie.
+
 const BASE_URL = '/api'; // Vite will proxy this
 
 /**
@@ -25,144 +27,37 @@ const getAPIKey = () => {
   }
 };
 
-/**
- * Get player information by tag
- * @param {string} playerTag - Player tag (e.g. #ABC123)
- * @returns {Promise<Object>} Player data
- */
-export const getPlayer = async (playerTag) => {
-  // Ensure correct tag format (The API requires tags to start with # and be URL encoded)
-  let processedTag = playerTag;
-  if (!processedTag.startsWith('#')) {
-    processedTag = '#' + processedTag;
+async function fetchFromApiRoutes(endpointPath) {
+  console.log("Client-side fetching from our API route:", endpointPath);
+  const response = await fetch(endpointPath, { // Calls /api/coc/player/TAG or /api/coc/clan/TAG
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: "Failed to parse error JSON from API route" , details: response.statusText}));
+    console.error(`Error from API Route (${response.status}):`, errorData);
+    throw new Error(errorData.error || `Failed to fetch from ${endpointPath}`);
   }
-  const formattedTag = encodeURIComponent(processedTag);
-  console.log(`Searching for player with tag: ${formattedTag} (original: ${playerTag})`);
-  
-  try {
-    console.log(`Full URL: ${BASE_URL}/players/${formattedTag}`);
-    
-    const apiKey = getAPIKey();
-    
-    // Make the API request
-    const response = await fetch(
-      `${BASE_URL}/players/${formattedTag}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`
-        }
-      }
-    );
-    
-    console.log(`Response status: ${response.status} ${response.statusText}`);
-    
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error('Player not found');
-      } else if (response.status === 403) {
-        throw new Error('Authentication failed - check API key and IP whitelist');
-      } else {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || `Error: ${response.status} ${response.statusText}`);
-      }
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error(`API Error (getPlayer): ${error.message}`);
-    throw error;
-  }
+  return response.json();
+}
+
+export const getPlayerInfo = async (playerTag) => {
+  const encodedPlayerTag = encodeURIComponent(playerTag);
+  // Note: We are now calling our own API endpoint, not the CoC API directly from client
+  return fetchFromApiRoutes(`/api/coc/player/${encodedPlayerTag}`);
 };
 
-/**
- * Get clan information by tag
- * @param {string} clanTag - Clan tag (e.g. #ABC123)
- * @returns {Promise<Object>} Clan data
- */
-export const getClan = async (clanTag) => {
-  // Ensure correct tag format (The API requires tags to start with # and be URL encoded)
-  let processedTag = clanTag;
-  if (!processedTag.startsWith('#')) {
-    processedTag = '#' + processedTag;
-  }
-  const formattedTag = encodeURIComponent(processedTag);
-  console.log(`Searching for clan with tag: ${formattedTag} (original: ${clanTag})`);
-  
-  try {
-    console.log(`Full URL: ${BASE_URL}/clans/${formattedTag}`);
-    
-    const apiKey = getAPIKey();
-    
-    const response = await fetch(
-      `${BASE_URL}/clans/${formattedTag}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`
-        }
-      }
-    );
-    
-    console.log(`Response status: ${response.status} ${response.statusText}`);
-    
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error('Clan not found');
-      } else if (response.status === 403) {
-        throw new Error('Authentication failed - check API key and IP whitelist');
-      } else {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || `Error: ${response.status} ${response.statusText}`);
-      }
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error(`API Error (getClan): ${error.message}`);
-    throw error;
-  }
+export const getClanInfo = async (clanTag) => {
+  const encodedClanTag = encodeURIComponent(clanTag);
+  return fetchFromApiRoutes(`/api/coc/clan/${encodedClanTag}`);
 };
 
-/**
- * Get clan war log
- * @param {string} clanTag - Clan tag
- * @returns {Promise<Object>} War log data
- */
-export const getClanWarLog = async (clanTag) => {
-  // Ensure correct tag format (The API requires tags to start with # and be URL encoded)
-  let processedTag = clanTag;
-  if (!processedTag.startsWith('#')) {
-    processedTag = '#' + processedTag;
-  }
-  const formattedTag = encodeURIComponent(processedTag);
-  console.log(`Searching for clan war log with tag: ${formattedTag} (original: ${clanTag})`);
-
-  try {
-    const apiKey = getAPIKey(); // Use the helper function
-    const response = await fetch(
-      `${BASE_URL}/clans/${formattedTag}/warlog`,
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}` // Use the fetched API key
-        }
-      }
-    );
-    
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error('Clan war log not found');
-      } else if (response.status === 403) {
-        throw new Error('Authentication failed or war log is private');
-      } else {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || `Error: ${response.status} ${response.statusText}`);
-      }
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error(`API Error (getClanWarLog): ${error.message}`);
-    throw error;
-  }
+export const getWarLog = async (clanTag) => {
+  const encodedClanTag = encodeURIComponent(clanTag);
+  return fetchFromApiRoutes(`/api/coc/warlog/${encodedClanTag}`);
 };
 
 /**

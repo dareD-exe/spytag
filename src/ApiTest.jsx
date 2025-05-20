@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getPlayer, getClan } from './services/cocApi';
+import { getPlayerInfo, getClanInfo } from './services/cocApi';
 
 export default function ApiTest() {
   const [tag, setTag] = useState('PJR8CQU9C');
@@ -17,9 +17,9 @@ export default function ApiTest() {
     try {
       let data;
       if (searchType === 'player') {
-        data = await getPlayer(tag);
+        data = await getPlayerInfo(tag);
       } else {
-        data = await getClan(tag);
+        data = await getClanInfo(tag);
       }
       setResult(data);
     } catch (err) {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
-import { getPlayer, getClan } from '../services/cocApi';
+import { getPlayerInfo, getClanInfo } from '../services/cocApi';
 
 export default function SearchPage() {
   const [searchParams] = useSearchParams();
@@ -28,7 +28,7 @@ export default function SearchPage() {
       
       try {
         // First try to fetch as player
-        const playerData = await getPlayer(tag);
+        const playerData = await getPlayerInfo(tag);
         setData(playerData);
         setType('player');
         document.title = `${playerData.name} | SpyTag`; // Title for player
@@ -36,7 +36,7 @@ export default function SearchPage() {
         console.error('Player fetch error:', playerError);
         try {
           // If not a player, try as clan
-          const clanData = await getClan(tag);
+          const clanData = await getClanInfo(tag);
           setData(clanData);
           setType('clan');
           document.title = `${clanData.name} | SpyTag`; // Title for clan
