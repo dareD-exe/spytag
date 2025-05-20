@@ -1,11 +1,13 @@
 /**
  * Clash of Clans API service
  * Documentation: https://developer.clashofclans.com/
+ * Last updated: Serverless function integration with Fixie
  */
 
 // This file now calls our Vercel Serverless Functions, which then call the CoC API via Fixie.
+console.log('🚀 Loading cocApi.js v2.0 with serverless functions at /api/coc/player, /api/coc/clan, etc.');
 
-const BASE_URL = '/api'; // Vite will proxy this
+const BASE_URL = '/api'; // Vite proxy is now disabled, we call serverless directly
 
 /**
  * Extract the complete API key from the .env file
